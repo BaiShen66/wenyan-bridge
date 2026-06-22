@@ -1,6 +1,0 @@
-f=open("article.md","w",encoding="utf-8")  
-f.write("---\n")  
-f.write('title: "\u5173\u4e8e\u5982\u4f55\u7528\u4e00\u665a\u4e0a\u628a\u81ea\u5df1\u6298\u817e\u6210\u4e00\u4e2a\u8fd0\u7ef4\u8fd9\u4ef6\u4e8b"\n')  
-f.write('author: "\u6bd4\u4f01\u8c37\u516b\u5e61 & \u96ea\u4e4b\u4e0b\u96ea\u4e43"\n')  
-f.write("---\n")  
-f.close() 
