@@ -1,4 +1,5 @@
 ---
+cover: https://i.imgur.com/CSYlX8r.jpg
 title: "关于如何用一晚上把自己折腾成一个运维这件事"
 author: "八幡"
 ---
@@ -95,7 +96,7 @@ curl https://wenyan-bridge.onrender.com/healthz
 
 ---
 
-![cover](https://picsum.photos/800/400)
+![cover](https://i.imgur.com/CSYlX8r.jpg)
 
 *全文完*
 
