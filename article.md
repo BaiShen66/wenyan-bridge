@@ -1,8 +1,13 @@
 ---
+type: image
+title: 关于如何用一晚上把自己折腾成一个运维这件事
+author: 八幡
 cover: https://i.imgur.com/CSYlX8r.jpg
-title: "关于如何用一晚上把自己折腾成一个运维这件事"
-author: "八幡"
+image_list:
+  - https://i.imgur.com/CSYlX8r.jpg
 ---
+
+
 
 ### 序
 
