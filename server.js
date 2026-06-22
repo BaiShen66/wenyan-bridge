@@ -11,7 +11,7 @@ async function init() {
     command: process.env.WENYAN_PATH || "wenyan-mcp",
     env: { WECHAT_APP_ID: process.env.WECHAT_APP_ID, WECHAT_APP_SECRET: process.env.WECHAT_APP_SECRET }
   })
-  client = new Client({name:"wenyan-bridge",version:"1.0.0"})
+  client = new Client({name:"wenyan-bridge",version:"1.0.0"},{capabilities:{}})
   await client.connect(transport)
   console.error("[Bridge] Connected")
 }
