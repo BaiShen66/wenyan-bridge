@@ -1,25 +1,13 @@
 import express from "express"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
+import fs from "fs"
+import { createRequire } from "module"
+const require = createRequire(import.meta.url)
 
 const app = express()
 app.use(express.json({limit:"10mb"}))
 let client = null
-
-async function getAccessToken() {
-  const r = await fetch("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+process.env.WECHAT_APP_ID+"&secret="+process.env.WECHAT_APP_SECRET)
-  const d = await r.json()
-  if (d.errcode) throw new Error("token: "+d.errmsg)
-  return d.access_token
-}
-
-async function publishDraft(media_id) {
-  const token = await getAccessToken()
-  const r = await fetch("https://api.weixin.qq.com/cgi-bin/freepublish/submit?access_token="+token, {method:"POST",body:JSON.stringify({media_id})})
-  const d = await r.json()
-  if (d.errcode && d.errcode !== 0) throw new Error("publish: "+d.errmsg)
-  return d
-}
 
 async function init() {
   const transport = new StdioClientTransport({
@@ -31,6 +19,19 @@ async function init() {
   console.error("[Bridge] Connected")
 }
 
+app.post("/publish", async (req, res) => {
+  try {
+    const { content, theme_id } = req.body
+    const tmp = "/tmp/article_"+Date.now()+".md"
+    fs.writeFileSync(tmp, content, "utf-8")
+    const r = await client.callTool({name:"publish_article",arguments:{file:tmp,theme_id:theme_id||"default"}})
+    fs.unlinkSync(tmp)
+    res.json({jsonrpc:"2.0",result:r})
+  } catch(e) {
+    res.json({error:e.message})
+  }
+})
+
 app.post("/mcp", async (req, res) => {
   try {
     const msg = req.body
@@ -38,22 +39,14 @@ app.post("/mcp", async (req, res) => {
       return res.json({jsonrpc:"2.0",id:msg.id,result:{protocolVersion:"0.6.0",capabilities:{tools:{}},serverInfo:{name:"wenyan-bridge",version:"1.0.0"}}})
     if (msg.method === "tools/list") {
       const t = await client.listTools()
-      t.tools.push({name:"publish_draft",description:"Publish a WeChat draft and wait for result.",inputSchema:{type:"object",properties:{media_id:{type:"string",description:"The media_id to publish"}},required:["media_id"]}})
+      t.tools.push({name:"publish_draft",description:"Publish a WeChat draft by media_id.",inputSchema:{type:"object",properties:{media_id:{type:"string",description:"The media_id to publish"}},required:["media_id"]}})
       return res.json({jsonrpc:"2.0",id:msg.id,result:t})
     }
     if (msg.method === "tools/call") {
       if (msg.params.name === "publish_draft") {
-        const r = await publishDraft(msg.params.arguments.media_id)
-        const pid = r.publish_id
-        let st = null
-        for (let i = 0; i < 10; i++) {
-          await new Promise(r => setTimeout(r, 3000))
-          const ck = await fetch("https://api.weixin.qq.com/cgi-bin/freepublish/get?access_token="+await getAccessToken(), {method:"POST",body:JSON.stringify({publish_id:pid})})
-          const cd = await ck.json()
-          if (cd.publish_status === 0) { st = "published"; break }
-          if (cd.publish_status === 1) { st = "failed"; break }
-        }
-        return res.json({jsonrpc:"2.0",id:msg.id,result:{content:[{type:"text",text:JSON.stringify({status:st||"timeout",publish_id:pid})}]}})
+        const token = await (await fetch("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential"+String.fromCharCode(38)+"appid="+process.env.WECHAT_APP_ID+String.fromCharCode(38)+"secret="+process.env.WECHAT_APP_SECRET)).json()
+        const sub = await (await fetch("https://api.weixin.qq.com/cgi-bin/freepublish/submit?access_token="+token.access_token,{method:"POST",body:JSON.stringify({media_id:msg.params.arguments.media_id})})).json()
+        return res.json({jsonrpc:"2.0",id:msg.id,result:{content:[{type:"text",text:JSON.stringify(sub)}]}})
       }
       const r = await client.callTool(msg.params)
       return res.json({jsonrpc:"2.0",id:msg.id,result:r})
