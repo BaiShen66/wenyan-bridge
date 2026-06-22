@@ -95,6 +95,8 @@ curl https://wenyan-bridge.onrender.com/healthz
 
 ---
 
+![cover](https://picsum.photos/800/400)
+
 *全文完*
 
 *P.S. 有些事情，看过就等于做过。*
