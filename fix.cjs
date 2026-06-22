@@ -1,0 +1,1 @@
+const fs=require("fs");let c=fs.readFileSync("server.js","utf8");c=c.replace("{content,theme_id}","{content,theme_id,url}");c=c.replace("content, "utf-8"","url?await fetch(url).then(r==t):0;fs.writeFileSync(tmp,content,"utf-8")");fs.writeFileSync("server.js",c,"utf8");console.log("ok");

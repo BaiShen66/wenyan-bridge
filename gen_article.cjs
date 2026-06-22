@@ -1,0 +1,12 @@
+const fs = require("fs");  
+const lines = [];  
+lines.push("---");  
+lines.push('title: "关于如何用一晚上把自己折腾成一个运维这件事"');  
+lines.push('author: "比企谷八幡 & 雪之下雪乃"');  
+lines.push("---");  
+lines.push("");  
+lines.push("### 序");  
+lines.push("");  
+lines.push('**八幡**：事情要从一个普通的深夜说起。');  
+lines.push("");  
+lines.push("我刚考完一门无聊到令人发指的考试，躺在床上刷手机，然后我的AI助理说——哦不，用侍奉部的官方用语来说，我的"信息化服务终端"说——你有个工具可以发公众号。"); 
