@@ -79,4 +79,20 @@ app.get("/healthz", (req, res) => res.json({status:"ok"}))
 app.get("/mcp", (req, res) => res.json({note:"POST JSON-RPC here"}))
 
 await init()
+
+// ★ Token 自动刷新：每 90 分钟重启 MCP 子进程拿新 token ★
+async function refreshToken() {
+  try {
+    console.error("[Bridge] Token refresh: restarting MCP client...")
+    if (client) {
+      try { await client.close() } catch(e) {}
+    }
+    await init()
+    console.error("[Bridge] Token refresh: done")
+  } catch(e) {
+    console.error("[Bridge] Token refresh failed:", e.message)
+  }
+}
+setInterval(refreshToken, 90 * 60 * 1000)  // 90分钟，比微信2小时提前
+
 app.listen(3333, () => console.error("Bridge on :3333"))
